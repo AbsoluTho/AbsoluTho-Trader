@@ -1,4 +1,4 @@
-const CACHE_NAME = 'absolutho-v3';
+const CACHE_NAME = 'absolutho-v4';
 const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './favicon.png', './logo-header.png', './splash-bg.jpg'];
 
 self.addEventListener('install', (e) => {

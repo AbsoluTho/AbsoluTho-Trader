@@ -13,6 +13,8 @@ A personal trading performance dashboard for **Absolutho Trader®**, built as an
 | `favicon.png` | Browser tab icon |
 | `logo-header.png` | Brand logo shown in the app header |
 | `splash-bg.jpg` | Background image shown on the splash screen at launch |
+| `manual.html` | Full Performance Manual, viewable in-app under the "Documentos" tab |
+| `sop.html` | Full SOP (Standard Operating Procedure) document, viewable in-app under the "Documentos" tab |
 
 ## Features
 
@@ -23,6 +25,7 @@ A personal trading performance dashboard for **Absolutho Trader®**, built as an
 - **Full session history** — sortable table of every recorded session
 - **Pre-SOP comparison** — baseline stats from before the SOP protocol was adopted
 - **Appendix** — operating philosophy, mantras, and grading criteria
+- **Documents** — the full Performance Manual and SOP, viewable inline in the app
 - **Add session** — a form to log a new trading day, with automatic grade calculation from the five behavioral criteria
 
 All data you add through the "Add session" form is stored locally on your device (`localStorage`) — nothing is sent to a server.
