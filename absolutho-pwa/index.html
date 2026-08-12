@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Absolutho Trader® — Performance 2026</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b0f14">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Absolutho">
+<style>
+:root{
+  --bg:#0b0f14;--surface1:#121821;--surface2:#1a222e;--border:#232d3a;
+  --text-primary:#e8edf2;--text-secondary:#8a96a3;--text-muted:#5c6773;
+  --pos:#1baf7a;--neg:#e34948;--amb:#eda100;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.app{max-width:700px;margin:0 auto;padding:1rem}
+.tabs{display:flex;gap:2px;margin-bottom:1.5rem;border-bottom:0.5px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:9px 12px;font-size:11px;cursor:pointer;border:none;background:transparent;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;letter-spacing:.4px;text-transform:uppercase;transition:color .15s}
+.tab.active{color:var(--text-primary);border-bottom-color:#2a78d6}
+.panel{display:none}.panel.active{display:block}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:1rem}
+.kpi{background:var(--surface1);border-radius:10px;padding:12px 14px}
+.kpi-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.kpi-val{font-size:20px;font-weight:600}.kpi-sub{font-size:10px;color:var(--text-secondary);margin-top:2px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.amb{color:var(--amb)}
+.chart-box{background:var(--surface1);border-radius:10px;padding:14px;margin-bottom:1rem}
+.chart-title{font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+@media(max-width:480px){.grid2{grid-template-columns:1fr}}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
+.ba{background:#0a3327;color:#3ddc9a}.bar{background:#2a2a2a;color:#bbb}.bb{background:#3a2c00;color:#eda100}.bc{background:#3a1414;color:#f08080}
+.hist-table,.hor-table,.mini-table{width:100%;border-collapse:collapse;font-size:11px}
+.hist-table th,.hor-table th,.mini-table th{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;padding:5px 6px;text-align:left;border-bottom:0.5px solid var(--border)}
+.hist-table td,.hor-table td,.mini-table td{padding:7px 6px;border-bottom:0.5px solid var(--border)}
+.hor-table th{text-align:right}.hor-table th:first-child{text-align:left}
+.hor-table td{text-align:right}.hor-table td:first-child{text-align:left;font-weight:500}
+.hor-table tr.destaque td{background:rgba(42,120,214,0.1)}
+.hor-table tr.negativa td{background:rgba(227,73,72,0.1)}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-label{font-size:10px;color:var(--text-secondary);width:76px;flex-shrink:0;text-align:right}
+.bar-track{flex:1;height:16px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.bar-pct{font-size:10px;font-weight:600;width:44px;text-align:right;flex-shrink:0}
+.anx-quote{border-left:3px solid #2a78d6;padding:8px 12px;margin:5px 0;font-size:11px;font-style:italic;color:var(--text-secondary);background:var(--surface1);border-radius:0 6px 6px 0;line-height:1.7}
+.anx-quote.principal{border-color:var(--pos);color:var(--text-primary);font-weight:500;font-size:12px}
+.leg{display:flex;gap:12px;font-size:10px;color:var(--text-secondary);flex-wrap:wrap;margin-top:6px}
+.leg span{display:flex;align-items:center;gap:3px}
+.dot{width:8px;height:8px;border-radius:2px;display:inline-block}
+.streak-cell{width:22px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;margin:1px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.8rem}
+@media(max-width:480px){.form-grid{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label{font-size:11px;color:var(--text-secondary)}
+.fg input,.fg textarea{padding:8px 10px;border:0.5px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text-primary);font-size:14px}
+.fg textarea{resize:vertical}
+.crit-row{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:0.5px solid var(--border)}
+.crit-row label{font-size:11px;color:var(--text-secondary);flex:1}
+.crit-row input{width:60px;text-align:center;padding:6px;border:0.5px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text-primary);font-size:14px}
+.btn-save{background:#2a78d6;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;cursor:pointer;font-weight:600;width:100%;margin-top:4px}
+.btn-save:active{background:#1d5fa8}
+.note-info{background:var(--surface1);border-left:3px solid #2a78d6;border-radius:0 8px 8px 0;padding:8px 12px;font-size:11px;color:var(--text-secondary);margin-bottom:.8rem}
+.diag-box{background:var(--surface1);border-radius:10px;padding:12px 14px;margin-bottom:8px;font-size:11px;line-height:1.6}
+.diag-box-pos{border-left:3px solid var(--pos)}
+.diag-box-neg{border-left:3px solid var(--neg)}
+.diag-box-amb{border-left:3px solid var(--amb)}
+.diag-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.2rem}
+.brand-eyebrow{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.brand-title{font-size:19px;font-weight:700}
+.reset-link{font-size:10px;color:var(--text-muted);text-decoration:underline;background:none;border:none;cursor:pointer;margin-top:8px}
+</style>
+</head>
+<body>
+<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#050708 url('splash-bg.jpg') center/cover no-repeat;display:flex;align-items:center;justify-content:center;transition:opacity .5s ease">
+  <img src="icon-512.png" alt="" style="width:96px;height:96px;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+</div>
+<div class="app">
+  <div class="header">
+    <div>
+      <img src="logo-header.png" alt="Absolutho Trader" style="height:26px;display:block;margin-bottom:4px">
+      <div class="brand-eyebrow">Performance 2026</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:10px;color:var(--text-muted)">Era SOP · 27/07–11/08</div>
+      <div id="hdr-capital" style="font-size:17px;font-weight:700;color:var(--pos)"></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="horarios">Horários</button>
+    <button class="tab" data-tab="diagnostico">Diagnóstico</button>
+    <button class="tab" data-tab="competencias">Competências</button>
+    <button class="tab" data-tab="historico">Histórico</button>
+    <button class="tab" data-tab="presop">Pré-SOP</button>
+    <button class="tab" data-tab="anexos">Anexos</button>
+    <button class="tab" data-tab="novo">+ Pregão</button>
+  </div>
+
+  <div class="panel active" id="panel-dashboard">
+    <div class="kpi-grid" id="kpi-grid"></div>
+    <div class="chart-box">
+      <div class="chart-title">Equity curve · Era SOP</div>
+      <div style="position:relative;height:190px"><canvas id="chartEquity"></canvas></div>
+    </div>
+    <div class="grid2">
+      <div class="chart-box" style="margin:0">
+        <div class="chart-title">Resultado por pregão</div>
+        <div style="position:relative;height:170px"><canvas id="chartPL"></canvas></div>
+      </div>
+      <div class="chart-box" style="margin:0">
+        <div class="chart-title">Wins · Losses · BE</div>
+        <div style="position:relative;height:130px"><canvas id="chartDonut"></canvas></div>
+        <div id="donut-leg" class="leg" style="justify-content:center;margin-top:6px"></div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Nota comportamental por pregão</div>
+      <div style="position:relative;height:170px"><canvas id="chartNotas"></canvas></div>
+      <div id="nota-streak" style="display:flex;gap:2px;flex-wrap:wrap;margin-top:8px"></div>
+      <div class="leg" style="margin-top:6px">
+        <span><span class="dot" style="background:#1baf7a"></span>Nota A</span>
+        <span><span class="dot" style="background:#888"></span>A c/ revisão</span>
+        <span><span class="dot" style="background:#eda100"></span>Nota B</span>
+        <span><span class="dot" style="background:#e34948"></span>Nota C</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-horarios">
+    <div class="chart-box">
+      <div class="chart-title">Assertividade por faixa de 30 min (base decisiva)</div>
+      <div id="hor-bars"></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Saldo financeiro por faixa</div>
+      <div style="position:relative;height:220px"><canvas id="chartHorSaldo"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Tabela detalhada · 66 trades · 27/07 a 11/08</div>
+      <table class="hor-table" id="hor-table-body">
+        <thead><tr><th>Faixa</th><th>Trades</th><th>G</th><th>L</th><th>BE</th><th>% Acerto</th><th>Saldo</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px">* Acerto = gains ÷ (gains+losses), excluindo BE</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-diagnostico">
+    <div class="chart-box">
+      <div class="chart-title">Por que a qualidade piora depois das 11h?</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px">Auditoria dos 6 losses abertos após as 11h · 2 pregões (27/07 e 11/08)</div>
+      <table class="mini-table">
+        <thead><tr><th>Data</th><th>Abertura</th><th>Loss</th><th>Saldo antes</th><th>Estado</th><th>Leitura provável</th></tr></thead>
+        <tbody>
+          <tr><td>27/07</td><td>11:03</td><td class="neg">−230</td><td class="pos">+170</td><td>Positivo</td><td>Devolução do lucro</td></tr>
+          <tr><td>27/07</td><td>11:26</td><td class="neg">−145</td><td class="pos">+40</td><td>Positivo</td><td>Defesa do saldo</td></tr>
+          <tr><td>27/07</td><td>11:30</td><td class="neg">−385</td><td class="neg">−105</td><td>Negativo</td><td>Vingança</td></tr>
+          <tr><td>11/08</td><td>11:16</td><td class="neg">−300</td><td class="pos">+339</td><td>Positivo</td><td>Devolução forte</td></tr>
+          <tr><td>11/08</td><td>11:20</td><td class="neg">−600</td><td class="pos">+39</td><td>Positivo</td><td>Recompor lucro devolvido</td></tr>
+          <tr><td>11/08</td><td>11:56</td><td class="neg">−190</td><td class="neg">−561</td><td>Negativo</td><td>Vingança</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="diag-box diag-box-amb">
+      <div class="diag-title">Diagnóstico em 3 camadas</div>
+      <b>1 · Aversão a devolver lucro</b> — padrão mais frequente: 4 dos 6 losses começaram com o dia ainda positivo. A urgência não era sair do prejuízo — era defender um lucro que estava diminuindo.<br><br>
+      <b>2 · Trades de vingança</b> — confirmados em 2 dos 6 losses. O pregão já estava negativo antes da entrada.<br><br>
+      <b>3 · Operação fora do planejado</b> — mudança de plano, entradas fora das zonas e, em 11/08, operações contra a aceitação abaixo da VAL.
+    </div>
+    <div class="diag-box diag-box-pos">
+      <div class="diag-title">Ciclo comportamental</div>
+      Lucro pequeno ou em redução → Aversão a devolver → Flexibilização do plano → Loss → Vingança
+    </div>
+    <div class="diag-box diag-box-neg">
+      <div class="diag-title">Pergunta-chave após as 11h</div>
+      "Não é apenas 'estou negativo?'. É também: <b>estou tentando impedir que um lucro menor pareça uma derrota?</b>"
+    </div>
+    <div class="note-info" style="margin-top:8px">Limite da amostra: os 6 losses concentram-se em apenas 2 pregões. O padrão é forte como alerta, mas ainda não autoriza proibição horária automática.</div>
+  </div>
+
+  <div class="panel" id="panel-competencias">
+    <div class="chart-box"><div class="chart-title">Execução do plano</div><div style="position:relative;height:150px"><canvas id="cC1"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Disciplina</div><div style="position:relative;height:150px"><canvas id="cC2"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Controle emocional</div><div style="position:relative;height:150px"><canvas id="cC3"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Gestão de risco</div><div style="position:relative;height:150px"><canvas id="cC4"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Seleção das operações</div><div style="position:relative;height:150px"><canvas id="cC5"></canvas></div></div>
+    <div class="chart-box">
+      <div class="chart-title">Visão consolidada</div>
+      <div style="position:relative;height:190px"><canvas id="cCAll"></canvas></div>
+      <div class="leg" style="margin-top:6px;justify-content:center">
+        <span><span class="dot" style="background:#2a78d6"></span>Execução</span>
+        <span><span class="dot" style="background:#eb6834"></span>Disciplina</span>
+        <span><span class="dot" style="background:#1baf7a"></span>Emocional</span>
+        <span><span class="dot" style="background:#eda100"></span>Risco</span>
+        <span><span class="dot" style="background:#e87ba4"></span>Seleção</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-historico">
+    <table class="hist-table">
+      <thead><tr><th>Data</th><th>P&amp;L</th><th>Trades</th><th>Acerto</th><th>Média</th><th>Conf.</th><th>Nota</th></tr></thead>
+      <tbody id="hist-body"></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="panel-presop">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">P&amp;L Pré-SOP</div><div class="kpi-val pos">+R$ 1.596</div><div class="kpi-sub">23/04–24/07</div></div>
+      <div class="kpi"><div class="kpi-label">Win rate trades</div><div class="kpi-val amb">57,08%</div><div class="kpi-sub">219 trades · 37 pregões</div></div>
+      <div class="kpi"><div class="kpi-label">Profit factor</div><div class="kpi-val neg">1,03</div><div class="kpi-sub">margem mínima</div></div>
+      <div class="kpi"><div class="kpi-label">Expectância</div><div class="kpi-val">R$ 7,29</div><div class="kpi-sub">por trade</div></div>
+      <div class="kpi"><div class="kpi-label">Gain médio</div><div class="kpi-val pos">R$ 404</div></div>
+      <div class="kpi"><div class="kpi-label">Loss médio</div><div class="kpi-val neg">−R$ 569</div><div class="kpi-sub">payoff 0,71</div></div>
+      <div class="kpi"><div class="kpi-label">Loss médio pts</div><div class="kpi-val">280 pts</div></div>
+      <div class="kpi"><div class="kpi-label">Drawdown máx.</div><div class="kpi-val neg">−R$ 11.367</div></div>
+    </div>
+    <div class="chart-box" style="margin-top:.5rem">
+      <div class="chart-title">Comparativo Pré-SOP vs Era SOP</div>
+      <div style="position:relative;height:200px"><canvas id="chartComp"></canvas></div>
+    </div>
+    <div class="diag-box diag-box-pos" style="margin-top:.5rem">
+      <div class="diag-title">O que mudou com o SOP</div>
+      Profit factor: 1,03 → 2,07 · Gain médio: R$ 404 → R$ 411 · Loss médio: −R$ 569 → −R$ 311 · Payoff: 0,71 → 1,32
+    </div>
+    <div class="diag-box diag-box-neg" style="margin-top:.5rem">
+      <div class="diag-title">Linha de base para o stop de 300 pontos</div>
+      37,5% dos losses ultrapassaram 300 pts na fase Pré-SOP; 18,75% superaram 400 pts.
+    </div>
+  </div>
+
+  <div class="panel" id="panel-anexos">
+    <div style="font-size:12px;font-weight:600;margin-bottom:10px">Filosofia operacional</div>
+    <div class="anx-quote principal">"Meu trabalho não é prever o mercado. Meu trabalho é executar cenários previamente planejados."</div>
+    <div class="anx-quote principal">"Eu não preciso encontrar o trade. Preciso esperar o trade me encontrar no lugar que planejei."</div>
+    <div class="anx-quote">"Prefiro terminar o dia pensando 'deixei dinheiro na mesa' do que 'quebrei minhas próprias regras'."</div>
+    <div class="anx-quote">"Trade sujo que funciona é mais perigoso do que o stop — porque reforça o comportamento errado."</div>
+    <div class="anx-quote">"Um stop é apenas informação. Não é uma dívida emocional que precisa ser recuperada."</div>
+    <div style="font-size:12px;font-weight:600;margin:14px 0 8px">Mantras operacionais</div>
+    <div class="anx-quote">"O preço chegar à ZFE não é entrada. É permissão para observar. A reação é o gatilho."</div>
+    <div class="anx-quote">"Após um STOP faça uma pausa. Considere parar de operar mesmo sem atingir o drawdown diário."</div>
+    <div class="anx-quote">"Meta mínima atingida: proteja o resultado. Não devolva o que já conquistou."</div>
+    <div class="anx-quote">"M60 localiza. M15 organiza a liquidez. M5 define o regime. A reação confirma. O M2 refina o timing."</div>
+    <div style="font-size:12px;font-weight:600;margin:14px 0 8px">Critérios eliminatórios de nota</div>
+    <div class="diag-box diag-box-neg" style="margin-bottom:6px"><b>1 · Tempo entre operações</b> — &lt; 2 min exige análise crítica; &lt; 1 min = forte indício de trade reativo.</div>
+    <div class="diag-box diag-box-neg" style="margin-bottom:6px"><b>2 · Position size não planejado</b> — qualquer aumento fora das regras, mesmo em operação lucrativa.</div>
+    <div class="diag-box diag-box-neg" style="margin-bottom:6px"><b>3 · Violação do drawdown diário</b> — limite absoluto, independente do valor monetário.</div>
+    <div class="diag-box diag-box-neg" style="margin-bottom:6px"><b>4 · Convicção incompatível</b> — abaixo do mínimo SOP = erro de seleção.</div>
+    <div class="diag-box diag-box-neg"><b>5 · High Water Mark</b> — grande devolução após atingir lucro relevante reduz a nota.</div>
+  </div>
+
+  <div class="panel" id="panel-novo">
+    <div class="note-info">Preencha os dados. A nota é calculada automaticamente pela média dos 5 critérios. Seus dados ficam salvos neste dispositivo (localStorage).</div>
+    <div class="form-grid">
+      <div class="fg"><label>Data</label><input type="date" id="f-data"></div>
+      <div class="fg"><label>Resultado (R$)</label><input type="number" id="f-pl"></div>
+      <div class="fg"><label>Trades</label><input type="number" id="f-trades"></div>
+      <div class="fg"><label>Gains</label><input type="number" id="f-gains"></div>
+      <div class="fg"><label>Losses</label><input type="number" id="f-losses"></div>
+      <div class="fg"><label>Breakevens</label><input type="number" id="f-be"></div>
+      <div class="fg"><label>Conformidade (%)</label><input type="number" id="f-conf" step="0.5"></div>
+      <div class="fg"><label>Convicção média</label><input type="number" id="f-conv" step="0.1"></div>
+    </div>
+    <div style="font-size:11px;font-weight:600;margin-bottom:8px">Avaliação comportamental (0–10)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.8rem">
+      <div class="crit-row"><label>Execução do plano</label><input type="number" id="c1" min="0" max="10" step="0.5"></div>
+      <div class="crit-row"><label>Disciplina</label><input type="number" id="c2" min="0" max="10" step="0.5"></div>
+      <div class="crit-row"><label>Controle emocional</label><input type="number" id="c3" min="0" max="10" step="0.5"></div>
+      <div class="crit-row"><label>Gestão de risco</label><input type="number" id="c4" min="0" max="10" step="0.5"></div>
+      <div class="crit-row"><label>Seleção das operações</label><input type="number" id="c5" min="0" max="10" step="0.5"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:.8rem">Média: <span id="media-calc" style="font-weight:600;color:var(--text-primary)">—</span> · Nota: <span id="nota-calc" style="font-weight:600"></span></div>
+    <div class="fg" style="margin-bottom:.8rem"><label>Debrief</label><textarea id="f-obs" rows="3"></textarea></div>
+    <button class="btn-save" onclick="salvarPregao()">Salvar pregão</button>
+    <button class="reset-link" onclick="resetarDados()">Restaurar dados originais (apagar pregões adicionados)</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const KEY='absolutho_v4_standalone';
+const SEED=[
+  {data:'27/07/2026',pl:608,trades:13,gains:6,losses:3,be:4,conf:50,conv:null,c1:7,c2:6.5,c3:9,c4:7.5,c5:7,obs:'',nota:'B'},
+  {data:'28/07/2026',pl:852,trades:6,gains:5,losses:0,be:1,conf:87.5,conv:null,c1:9.5,c2:9,c3:9.5,c4:9,c5:9,obs:'Trend Day. Nota A.',nota:'A'},
+  {data:'29/07/2026',pl:1485,trades:3,gains:2,losses:1,be:0,conf:100,conv:9.75,c1:10,c2:9.5,c3:10,c4:9.5,c5:10,obs:'Setup E-03 perfeito.',nota:'A'},
+  {data:'30/07/2026',pl:-807,trades:5,gains:1,losses:4,be:0,conf:37.5,conv:6.5,c1:4,c2:3,c3:6,c4:5,c5:4,obs:'Nota C. Revenge trading.',nota:'C'},
+  {data:'03/08/2026',pl:756,trades:6,gains:3,losses:2,be:1,conf:50,conv:8.5,c1:8,c2:7,c3:9.5,c4:8.5,c5:9,obs:'Escalada após stops.',nota:'AR'},
+  {data:'04/08/2026',pl:932,trades:1,gains:1,losses:0,be:0,conf:87.5,conv:9.9,c1:9.5,c2:10,c3:10,c4:9.5,c5:10,obs:'1 trade perfeito.',nota:'A'},
+  {data:'05/08/2026',pl:-1185,trades:5,gains:1,losses:4,be:0,conf:37.5,conv:7,c1:5,c2:4,c3:6,c4:4.5,c5:5,obs:'Nota C. Antecipações.',nota:'C'},
+  {data:'06/08/2026',pl:634,trades:4,gains:3,losses:1,be:0,conf:75,conv:8.8,c1:8.5,c2:8,c3:9,c4:8.5,c5:9,obs:'Boa disciplina.',nota:'B'},
+  {data:'07/08/2026',pl:2701,trades:4,gains:2,losses:2,be:0,conf:25,conv:8,c1:7.5,c2:3,c3:7,c4:2,c5:5,obs:'Nota C. Escalada 5→10.',nota:'C'},
+  {data:'10/08/2026',pl:1017,trades:4,gains:3,losses:1,be:0,conf:62.5,conv:8.5,c1:8.5,c2:6.5,c3:8.5,c4:6,c5:9.5,obs:'Nota B. Op2 superdimensionada.',nota:'B'},
+  {data:'11/08/2026',pl:639,trades:12,gains:6,losses:6,be:0,conf:4,conv:8.5,c1:7,c2:4,c3:7,c4:3,c5:8,obs:'Nota C. Conformidade 4,0. Limites sistêmicos violados. 12 trades.',nota:'C'},
+];
+const HOR=[
+  {faixa:'09:00–09:29',trades:12,g:10,l:2,be:0,saldo:884},
+  {faixa:'09:30–09:59',trades:10,g:4,l:5,be:1,saldo:-991},
+  {faixa:'10:00–10:29',trades:26,g:13,l:7,be:6,saldo:5241},
+  {faixa:'10:30–10:59',trades:7,g:4,l:3,be:0,saldo:1760},
+  {faixa:'11:00–11:29',trades:6,g:2,l:4,be:0,saldo:-1175},
+  {faixa:'11:30–11:59',trades:3,g:1,l:2,be:0,saldo:409},
+  {faixa:'12:00–12:29',trades:2,g:2,l:0,be:0,saldo:1504},
+];
+let pregoes=[];let CH={};
+
+function load(){
+  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.length)return d;}}catch(e){}
+  return JSON.parse(JSON.stringify(SEED));
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(pregoes));}catch(e){}}
+function resetarDados(){if(confirm('Isso vai apagar todos os pregões adicionados manualmente e restaurar apenas os 11 originais. Continuar?')){localStorage.removeItem(KEY);pregoes=JSON.parse(JSON.stringify(SEED));renderDashboard();showTab('dashboard');}}
+
+function nc(n){return{'A':'#1baf7a','AR':'#888','B':'#eda100','C':'#e34948'}[n]||'#eda100';}
+function nb(n){const m={'A':'ba','AR':'bar','B':'bb','C':'bc'};return`<span class="badge ${m[n]||'bb'}">Nota ${n==='AR'?'A*':n}</span>`;}
+function fpl(v){const a=Math.abs(v).toLocaleString('pt-BR');return v>=0?`<span class="pos">+${a}</span>`:`<span class="neg">−${a}</span>`;}
+function avg(...vs){const f=vs.flat().filter(v=>v!==null&&v!==undefined&&!isNaN(v));return f.length?(f.reduce((a,b)=>a+b,0)/f.length):null;}
+function calcNota(m){return m>=9?'A':m>=8?'AR':m>=7?'B':'C';}
+
+const TICK='#8a96a3',GRID='rgba(255,255,255,0.06)';
+function mkChart(id,type,labels,datasets,opts){if(CH[id])CH[id].destroy();CH[id]=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:opts});}
+
+function renderDashboard(){
+  const p=pregoes;
+  const saldo=3110.59+p.reduce((a,b)=>a+b.pl,0);
+  document.getElementById('hdr-capital').textContent='R$ '+saldo.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const tG=p.reduce((a,b)=>a+b.gains,0),tL=p.reduce((a,b)=>a+b.losses,0),tBE=p.reduce((a,b)=>a+b.be,0),tT=tG+tL+tBE;
+  const acerto=tT?((tG/tT)*100).toFixed(1):0;
+  const gR=p.filter(x=>x.pl>0).reduce((a,b)=>a+b.pl,0);
+  const lR=Math.abs(p.filter(x=>x.pl<0).reduce((a,b)=>a+b.pl,0));
+  const pf=lR?(gR/lR).toFixed(2):'∞';
+  const notaA=p.filter(x=>x.nota==='A'||x.nota==='AR').length;
+  const meds=p.map(x=>avg(x.c1,x.c2,x.c3,x.c4,x.c5)).filter(v=>v!==null);
+  const mg=meds.length?(meds.reduce((a,b)=>a+b,0)/meds.length).toFixed(1):'—';
+  const confM=(p.reduce((a,b)=>a+(b.conf||0),0)/p.length).toFixed(1);
+  const tPL=p.reduce((a,b)=>a+b.pl,0);
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Capital SOP</div><div class="kpi-val pos">R$ ${Math.round(saldo).toLocaleString('pt-BR')}</div><div class="kpi-sub">base: R$ 3.110</div></div>
+    <div class="kpi"><div class="kpi-label">Rentabilidade SOP</div><div class="kpi-val pos">+${(((saldo-3110.59)/3110.59)*100).toFixed(1)}%</div><div class="kpi-sub">${p.length} pregões</div></div>
+    <div class="kpi"><div class="kpi-label">Taxa de acerto</div><div class="kpi-val ${acerto>=55?'pos':'amb'}">${acerto}%</div><div class="kpi-sub">${tG}G · ${tL}L · ${tBE}BE</div></div>
+    <div class="kpi"><div class="kpi-label">Profit factor</div><div class="kpi-val ${parseFloat(pf)>=2?'pos':'amb'}">${pf}</div></div>
+    <div class="kpi"><div class="kpi-label">Média comportamental</div><div class="kpi-val ${parseFloat(mg)>=8?'pos':'amb'}">${mg}/10</div></div>
+    <div class="kpi"><div class="kpi-label">Pregões Nota A</div><div class="kpi-val pos">${notaA}/200</div><div class="kpi-sub">missão 200 Nota A</div></div>
+    <div class="kpi"><div class="kpi-label">Conformidade média</div><div class="kpi-val ${parseFloat(confM)>=75?'pos':'amb'}">${confM}%</div></div>
+    <div class="kpi"><div class="kpi-label">Resultado SOP</div><div class="kpi-val ${tPL>=0?'pos':'neg'}">${tPL>=0?'+':'−'}R$ ${Math.abs(tPL).toLocaleString('pt-BR')}</div></div>
+  `;
+  const labels=p.map(x=>x.data.substring(0,5));
+  let r=3110.59;const bal=p.map(x=>{r+=x.pl;return Math.round(r);});
+  mkChart('chartEquity','line',labels,[{data:bal,borderColor:'#1baf7a',backgroundColor:'rgba(27,175,122,0.1)',borderWidth:2,fill:true,tension:0.3,pointRadius:3,pointBackgroundColor:'#1baf7a'}],{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TICK,font:{size:9}}},y:{grid:{color:GRID},ticks:{color:TICK,font:{size:9},callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}});
+  mkChart('chartPL','bar',labels,[{data:p.map(x=>x.pl),backgroundColor:p.map(x=>x.pl>=0?'#1baf7a':'#e34948'),borderRadius:4,borderSkipped:false}],{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TICK,font:{size:9}}},y:{grid:{color:GRID},ticks:{color:TICK,font:{size:9}}}}});
+  mkChart('chartDonut','doughnut',['Gain','Loss','BE'],[{data:[tG,tL,tBE],backgroundColor:['#1baf7a','#e34948','#eda100'],borderWidth:2,borderColor:'#121821',hoverOffset:4}],{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}});
+  document.getElementById('donut-leg').innerHTML=`<span><span class="dot" style="background:#1baf7a"></span>Gains ${tG}</span><span><span class="dot" style="background:#e34948"></span>Losses ${tL}</span><span><span class="dot" style="background:#eda100"></span>BE ${tBE}</span>`;
+  const sc=p.map(x=>{const m=avg(x.c1,x.c2,x.c3,x.c4,x.c5);return m?parseFloat(m.toFixed(1)):null;});
+  mkChart('chartNotas','bar',labels,[{data:sc,backgroundColor:p.map(x=>nc(x.nota)),borderRadius:4,borderSkipped:false,barThickness:22}],{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TICK,font:{size:9}}},y:{min:0,max:10,grid:{color:GRID},ticks:{color:TICK,font:{size:9}}}}});
+  document.getElementById('nota-streak').innerHTML=p.map(x=>`<span class="streak-cell" style="background:${nc(x.nota)}" title="${x.data}">${x.nota==='AR'?'A*':x.nota}</span>`).join('');
+}
+
+function renderHorarios(){
+  const bars=document.getElementById('hor-bars');
+  bars.innerHTML=HOR.map(h=>{
+    const dec=h.g+h.l;const pct=dec?(h.g/dec*100):0;
+    const color=pct>=65?'#1baf7a':pct>=50?'#eda100':'#e34948';
+    return`<div class="bar-row"><div class="bar-label">${h.faixa}</div><div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${color}"></div></div><div class="bar-pct" style="color:${color}">${pct.toFixed(0)}%</div></div>`;
+  }).join('');
+  const labels=HOR.map(h=>h.faixa.split('–')[0]);
+  const saldos=HOR.map(h=>h.saldo);
+  mkChart('chartHorSaldo','bar',labels,[{data:saldos,backgroundColor:saldos.map(v=>v>=0?'#1baf7a':'#e34948'),borderRadius:4,borderSkipped:false}],{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TICK,font:{size:9}}},y:{grid:{color:GRID},ticks:{color:TICK,font:{size:9},callback:v=>(v>=0?'+':'')+v.toLocaleString('pt-BR')}}}});
+  const tbody=document.querySelector('#hor-table-body tbody');
+  tbody.innerHTML=HOR.map(h=>{
+    const dec=h.g+h.l;const pct=dec?(h.g/dec*100).toFixed(0)+'%':'—';
+    const cls=h.saldo>=0?(h.saldo>2000?'destaque':''):'negativa';
+    return`<tr class="${cls}"><td>${h.faixa}</td><td>${h.trades}</td><td class="pos">${h.g}</td><td class="neg">${h.l}</td><td class="amb">${h.be}</td><td>${pct}</td><td class="${h.saldo>=0?'pos':'neg'}">${h.saldo>=0?'+':'-'}R$ ${Math.abs(h.saldo).toLocaleString('pt-BR')}</td></tr>`;
+  }).join('');
+}
+
+function renderCompetencias(){
+  const p=pregoes;const labels=p.map(x=>x.data.substring(0,5));
+  const colors=['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4'];
+  const fields=['c1','c2','c3','c4','c5'];const ids=['cC1','cC2','cC3','cC4','cC5'];
+  const opts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TICK,font:{size:9}}},y:{min:0,max:10,grid:{color:GRID},ticks:{color:TICK,font:{size:9},stepSize:2}}}};
+  fields.forEach((f,i)=>mkChart(ids[i],'line',labels,[{data:p.map(x=>x[f]||0),borderColor:colors[i],backgroundColor:colors[i]+'18',borderWidth:2,fill:true,tension:0.3,pointRadius:3,pointBackgroundColor:colors[i]}],opts));
+  mkChart('cCAll','line',labels,fields.map((f,i)=>({label:['Execução','Disciplina','Emocional','Risco','Seleção'][i],data:p.map(x=>x[f]||0),borderColor:colors[i],backgroundColor:'transparent',borderWidth:2,tension:0.3,pointRadius:2,pointBackgroundColor:colors[i]})),{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TICK,font:{size:9}}},y:{min:0,max:10,grid:{color:GRID},ticks:{color:TICK,font:{size:9},stepSize:2}}}});
+}
+
+function renderHistorico(){
+  document.getElementById('hist-body').innerHTML=pregoes.slice().reverse().map(x=>{
+    const tot=x.gains+x.losses+x.be;const ac=tot?Math.round(x.gains/tot*100):0;
+    const m=avg(x.c1,x.c2,x.c3,x.c4,x.c5);
+    return`<tr><td>${x.data.substring(0,5)}</td><td>${fpl(x.pl)}</td><td style="text-align:center">${x.trades}</td><td>${ac}%</td><td style="text-align:center">${m?m.toFixed(1):'—'}</td><td>${x.conf!=null?x.conf+'%':'—'}</td><td>${nb(x.nota)}</td></tr>`;
+  }).join('');
+}
+
+function renderPreSOP(){
+  mkChart('chartComp','bar',['Win rate','Profit factor','Gain médio','Loss médio (abs)'],[
+    {label:'Pré-SOP',data:[57.08,1.03,404,569],backgroundColor:'rgba(140,140,140,0.7)',borderRadius:4},
+    {label:'Era SOP',data:[54.55,2.07,411,311],backgroundColor:'rgba(27,175,122,0.7)',borderRadius:4}
+  ],{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TICK,font:{size:9}}},y:{grid:{color:GRID},ticks:{color:TICK,font:{size:9}}}}});
+}
+
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
+  document.querySelector(`[data-tab="${t}"]`).classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='horarios')renderHorarios();
+  if(t==='competencias')renderCompetencias();
+  if(t==='historico')renderHistorico();
+  if(t==='presop')renderPreSOP();
+}
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
+
+['c1','c2','c3','c4','c5'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    const vals=['c1','c2','c3','c4','c5'].map(i=>parseFloat(document.getElementById(i).value)).filter(v=>!isNaN(v));
+    if(!vals.length){document.getElementById('media-calc').textContent='—';document.getElementById('nota-calc').textContent='';return;}
+    const m=(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+    const n=calcNota(parseFloat(m));
+    document.getElementById('media-calc').textContent=m;
+    document.getElementById('nota-calc').textContent=n+(n==='AR'?' (A com revisão)':'');
+    document.getElementById('nota-calc').style.color=nc(n);
+  });
+});
+
+function salvarPregao(){
+  const dataRaw=document.getElementById('f-data').value;
+  const pl=parseFloat(document.getElementById('f-pl').value);
+  if(!dataRaw||isNaN(pl)){alert('Preencha pelo menos data e resultado.');return;}
+  const fmt=new Date(dataRaw+'T12:00:00').toLocaleDateString('pt-BR');
+  const get=(id,fn=parseFloat)=>{const v=document.getElementById(id).value;return v===''?null:fn(v);};
+  const c1=get('c1'),c2=get('c2'),c3=get('c3'),c4=get('c4'),c5=get('c5');
+  const med=avg(c1,c2,c3,c4,c5);const nota=med?calcNota(med):'B';
+  pregoes.push({data:fmt,pl,trades:get('f-trades',parseInt)||0,gains:get('f-gains',parseInt)||0,losses:get('f-losses',parseInt)||0,be:get('f-be',parseInt)||0,conf:get('f-conf'),conv:get('f-conv'),c1,c2,c3,c4,c5,obs:document.getElementById('f-obs').value,nota});
+  pregoes.sort((a,b)=>{const pa=a.data.split('/').reverse().join('-'),pb=b.data.split('/').reverse().join('-');return pa.localeCompare(pb);});
+  save();renderDashboard();showTab('dashboard');
+  ['f-data','f-pl','f-trades','f-gains','f-losses','f-be','f-conf','f-conv','f-obs','c1','c2','c3','c4','c5'].forEach(id=>document.getElementById(id).value='');
+}
+
+pregoes=load();renderDashboard();
+
+const splash=document.getElementById('splash');
+if(splash){
+  setTimeout(()=>{
+    splash.style.opacity='0';
+    setTimeout(()=>splash.remove(),520);
+  },700);
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
