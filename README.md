@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/30963567/README.md)
 # Absolutho Performance
 
 A personal trading performance dashboard for **Absolutho Trader®**, built as an installable Progressive Web App (PWA). It tracks day trading sessions (SOP era), behavioral scoring, time-of-day analysis, and comparisons against the pre-SOP baseline.
