@@ -94,7 +94,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:-apple-system,Bl
       <div class="brand-eyebrow">Performance 2026</div>
     </div>
     <div style="text-align:right">
-      <div style="font-size:10px;color:var(--text-muted)">Era SOP · 27/07–11/08</div>
+      <div style="font-size:10px;color:var(--text-muted)">Era SOP · 27/07–14/08</div>
       <div id="hdr-capital" style="font-size:17px;font-weight:700;color:var(--pos)"></div>
     </div>
   </div>
@@ -151,7 +151,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:-apple-system,Bl
       <div style="position:relative;height:220px"><canvas id="chartHorSaldo"></canvas></div>
     </div>
     <div class="chart-box">
-      <div class="chart-title">Tabela detalhada · 66 trades · 27/07 a 11/08</div>
+      <div class="chart-title">Tabela detalhada · 78 trades · 27/07 a 14/08</div>
       <table class="hor-table" id="hor-table-body">
         <thead><tr><th>Faixa</th><th>Trades</th><th>G</th><th>L</th><th>BE</th><th>% Acerto</th><th>Saldo</th></tr></thead>
         <tbody></tbody>
@@ -320,12 +320,15 @@ const SEED=[
   {data:'07/08/2026',pl:2701,trades:4,gains:2,losses:2,be:0,conf:25,conv:8,c1:7.5,c2:3,c3:7,c4:2,c5:5,obs:'Nota C. Escalada 5→10.',nota:'C'},
   {data:'10/08/2026',pl:1017,trades:4,gains:3,losses:1,be:0,conf:62.5,conv:8.5,c1:8.5,c2:6.5,c3:8.5,c4:6,c5:9.5,obs:'Nota B. Op2 superdimensionada.',nota:'B'},
   {data:'11/08/2026',pl:639,trades:12,gains:6,losses:6,be:0,conf:4,conv:8.5,c1:7,c2:4,c3:7,c4:3,c5:8,obs:'Nota C. Conformidade 4,0. Limites sistêmicos violados. 12 trades.',nota:'C'},
+  {data:'12/08/2026',pl:-1726,trades:7,gains:3,losses:4,be:0,conf:3,conv:null,c1:6,c2:2,c3:3,c4:2,c5:7,obs:'Nota C. Escalada para 10 contratos após loss de 5. Três losses finais somaram −R$2.145.',nota:'C'},
+  {data:'13/08/2026',pl:0,trades:0,gains:0,losses:0,be:0,conf:null,conv:null,c1:null,c2:null,c3:null,c4:null,c5:null,obs:'Decisão A de preservação. Sem operações após o loss de 12/08. Não conta para os 200.',nota:'P'},
+  {data:'14/08/2026',pl:755,trades:5,gains:3,losses:2,be:0,conf:100,conv:null,c1:9,c2:8.5,c3:9.5,c4:7.5,c5:8,obs:'A com Revisão. Comportamento aderente; gestão do lote residual em revisão técnica (não comportamental).',nota:'AR'},
 ];
 const HOR=[
   {faixa:'09:00–09:29',trades:12,g:10,l:2,be:0,saldo:884},
-  {faixa:'09:30–09:59',trades:10,g:4,l:5,be:1,saldo:-991},
-  {faixa:'10:00–10:29',trades:26,g:13,l:7,be:6,saldo:5241},
-  {faixa:'10:30–10:59',trades:7,g:4,l:3,be:0,saldo:1760},
+  {faixa:'09:30–09:59',trades:12,g:5,l:6,be:1,saldo:-1114},
+  {faixa:'10:00–10:29',trades:33,g:18,l:9,be:6,saldo:6538},
+  {faixa:'10:30–10:59',trades:10,g:4,l:6,be:0,saldo:-385},
   {faixa:'11:00–11:29',trades:6,g:2,l:4,be:0,saldo:-1175},
   {faixa:'11:30–11:59',trades:3,g:1,l:2,be:0,saldo:409},
   {faixa:'12:00–12:29',trades:2,g:2,l:0,be:0,saldo:1504},
@@ -339,8 +342,8 @@ function load(){
 function save(){try{localStorage.setItem(KEY,JSON.stringify(pregoes));}catch(e){}}
 function resetarDados(){if(confirm('Isso vai apagar todos os pregões adicionados manualmente e restaurar apenas os 11 originais. Continuar?')){localStorage.removeItem(KEY);pregoes=JSON.parse(JSON.stringify(SEED));renderDashboard();showTab('dashboard');}}
 
-function nc(n){return{'A':'#1baf7a','AR':'#888','B':'#eda100','C':'#e34948'}[n]||'#eda100';}
-function nb(n){const m={'A':'ba','AR':'bar','B':'bb','C':'bc'};return`<span class="badge ${m[n]||'bb'}">Nota ${n==='AR'?'A*':n}</span>`;}
+function nc(n){return{'A':'#1baf7a','AR':'#888','B':'#eda100','C':'#e34948','P':'#2a78d6'}[n]||'#eda100';}
+function nb(n){const m={'A':'ba','AR':'bar','B':'bb','C':'bc','P':'ba'};const label=n==='AR'?'A*':(n==='P'?'Preservação':n);return`<span class="badge ${m[n]||'bb'}">${n==='P'?label:'Nota '+label}</span>`;}
 function fpl(v){const a=Math.abs(v).toLocaleString('pt-BR');return v>=0?`<span class="pos">+${a}</span>`:`<span class="neg">−${a}</span>`;}
 function avg(...vs){const f=vs.flat().filter(v=>v!==null&&v!==undefined&&!isNaN(v));return f.length?(f.reduce((a,b)=>a+b,0)/f.length):null;}
 function calcNota(m){return m>=9?'A':m>=8?'AR':m>=7?'B':'C';}
